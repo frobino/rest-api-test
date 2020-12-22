@@ -46,6 +46,18 @@
 	  <artifactId>json</artifactId>
 	  <version>20201115</version>
 	</dependency>
+	<!-- Needed for @XmlRootElement -->
+	<dependency>
+    	<groupId>javax.xml.bind</groupId>
+    	<artifactId>jaxb-api</artifactId>
+    	<version>2.3.1</version>
+	</dependency>
+	<!-- Needed for automatic class -> json -->
+	<dependency>
+    	<groupId>org.glassfish.jersey.media</groupId>
+    	<artifactId>jersey-media-json-jackson</artifactId>
+    	<version>2.27</version>
+	</dependency>
 
   </dependencies>
   <build>
