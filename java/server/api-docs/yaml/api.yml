@@ -1,0 +1,120 @@
+openapi: '3.0.2'
+info:
+  description: Open source REST API for Todo-list (MVC) example.
+  version: 0.1.0
+  title: Todo-list protocol
+  termsOfService: http://frobino.org/
+  contact:
+    email: frobino@frobino.org
+  license:
+    name: Apache 2
+    url: http://www.apache.org/licenses/
+servers:
+  - url: 'http://localhost:8080/jaxrs-test-app/crunchify'
+tags:
+- name: Model
+  description: How to manage model on your server.
+- name: Resource
+  description: How to manage one resource of the model on your server
+paths:
+  /model:
+    get:
+      tags:
+      - Model
+      summary: Get the list of Todos stored on the server.
+      operationId: getTodos
+      responses:
+        200:
+          description: Returns a list of Todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      tags:
+      - Model
+      summary: Create a new Todo in the model
+      description: Create a new Todo in the model.
+      operationId: addTodo
+      responses:
+        201:
+          description: The Todo has been successfully added to the model.
+
+  /model/{todoId}:
+    delete:
+      tags:
+      - Resource
+      summary: Remove a Todo from the model.
+      operationId: deleteTodo
+      responses:
+        200:
+          description: The Todo was successfully deleted
+        204:
+          description: There was no Todo with this name to close / delete
+    post:
+      tags:
+      - Resource
+      summary: Edit a Todo which is already present in the model
+      description: Edit a Todo which is already present in the model.
+      operationId: editTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+      responses:
+        200:
+          description: The Todo has been successfully edited in the model.
+    patch:
+      tags:
+      - Resource
+      summary: Send an action to execute on a Todo which is already present in the model
+      description: Send an action to execute on a Todo which is already present in the model.
+        Available actions - toggle.
+      operationId: toggleTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                op:
+                  description: Action (operation) to be exectuted. Currently only "toggle" is available.
+                  type: string
+              required:
+                - op
+      responses:
+        200:
+          description: The action has been successfully executed.
+    get:
+      tags:
+      - Resource
+      summary: Get the Todo stored in the model.
+      operationId: getTodo
+      responses:
+        200:
+          description: Returns a Todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          description: The todo unique identifier
+          type: integer
+          format: int32
+        text:
+          description: Text describing the Todo
+          type: string
+        complete:
+          description: Status of the complete flag
+          type: boolean
