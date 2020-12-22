@@ -14,32 +14,38 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm</artifactId>
-			<version>3.3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-bundle</artifactId>
-			<version>1.19.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20170516</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>1.19.4</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-core</artifactId>
-			<version>1.19.4</version>
-		</dependency>
+	<!-- For Jersey 1.x
+	<dependency>
+	  <groupId>com.sun.jersey</groupId>
+	  <artifactId>jersey-server</artifactId>
+	  <version>1.19</version>
+	</dependency>
+	<dependency>
+	  <groupId>com.sun.jersey</groupId>
+	  <artifactId>jersey-servlet</artifactId>
+	  <version>1.19</version>
+	</dependency> -->
+	<!-- For Jersey 2.x -->
+	<dependency>
+	  <groupId>org.glassfish.jersey.core</groupId>
+	  <artifactId>jersey-server</artifactId>
+	  <version>2.27</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.glassfish.jersey.containers</groupId>
+	  <artifactId>jersey-container-servlet</artifactId>
+	  <version>2.27</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.glassfish.jersey.inject</groupId>
+	  <artifactId>jersey-hk2</artifactId>
+	  <version>2.27</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.json</groupId>
+	  <artifactId>json</artifactId>
+	  <version>20201115</version>
+	</dependency>
 
   </dependencies>
   <build>
