@@ -53,3 +53,5 @@ Expected 36.666
 [not up-to-date but concise example of jaxrs (jersey 1.0) + maven](https://crunchify.com/how-to-build-restful-service-with-java-using-jax-rs-and-jersey/)
 
 [up-to-date example of jaxrs (jersey 2.7) + maven](https://github.com/naveenvemulapalli/test-jersey-rest-maven-tomcat)
+
+[add CORS to jaxrs (jersey) server](https://crunchify.com/what-is-cross-origin-resource-sharing-cors-how-to-add-it-to-your-java-jersey-web-server/)

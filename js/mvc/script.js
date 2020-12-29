@@ -223,9 +223,47 @@ class Controller {
   // MODEL -> VIEW
 
   onTodoListChanged = todos => {
-    // TODO frobino: GET, receive list of todos [{},{},...]
-    // then, call the following line:
-    this.view.displayTodos(todos)
+    // frobino: GET, receive list of todos [{},{},...]
+    //
+    // original:
+    // this.view.displayTodos(todos)
+
+    var getJSON = function(url, view, callback) {
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'json';
+
+      xhr.onload = function() {
+
+          var status = xhr.status;
+
+          if (status == 200) {
+              callback(null, xhr.response, view);
+          } else {
+              callback(status);
+          }
+      };
+
+      xhr.send();
+    };
+
+    getJSON('http://localhost:8080/jaxrs-test-app/crunchify/model', this.view,
+      function(err, data, view) {
+        if (err != null) {
+            console.error(err);
+        } else {
+         // Debug
+         console.log('Output: ', data);
+         // TODO: currently hardcoded for one single object returned, and pushed in a list.
+         // Check what happens when the server returns multiple items.
+         var res = [];
+         res.push(data);
+         view.displayTodos(res)
+        }
+      }
+    );
+
   }
 
   // VIEW -> MODEL
