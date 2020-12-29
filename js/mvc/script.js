@@ -255,11 +255,7 @@ class Controller {
         } else {
          // Debug
          console.log('Output: ', data);
-         // TODO: currently hardcoded for one single object returned, and pushed in a list.
-         // Check what happens when the server returns multiple items.
-         var res = [];
-         res.push(data);
-         view.displayTodos(res)
+         view.displayTodos(data)
         }
       }
     );
@@ -270,6 +266,11 @@ class Controller {
 
   handleAddTodo = todoText => {
     // TODO frobino: POST {todoText}
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:8080/jaxrs-test-app/crunchify/model");
+    xhr.send(todoText)
+
     this.model.addTodo(todoText)
   }
 
