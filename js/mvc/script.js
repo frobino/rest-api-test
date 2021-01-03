@@ -280,7 +280,7 @@ class Controller {
   }
 
   handleDeleteTodo = id => {
-    // TODO frobino: POST {id}
+    // TODO frobino: POST {id} or maybe DELETE to crunchify/model/1 ?
     this.model.deleteTodo(id)
   }
 
