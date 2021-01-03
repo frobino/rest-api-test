@@ -281,6 +281,15 @@ class Controller {
 
   handleDeleteTodo = id => {
     // TODO frobino: POST {id} or maybe DELETE to crunchify/model/1 ?
+
+    let xhr = new XMLHttpRequest();
+    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
+    xhr.open("DELETE", resource);
+    // xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+    // xhr.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With, Authorization, Accept-Version, Content-MD5, CSRF-Token, Content-Type");
+    // xhr.setRequestHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+    xhr.send()
+
     this.model.deleteTodo(id)
   }
 

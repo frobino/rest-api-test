@@ -7,9 +7,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * Model
@@ -17,6 +21,13 @@ import javax.ws.rs.core.Response;
 @Path("/model")
 public class Model {
     
+    // Allows to insert contextual objects into the class,
+    // e.g. ServletContext, Request, Response, UriInfo
+    @Context
+    UriInfo uriInfo;
+    @Context
+    Request request;
+	
     public Model(){}
 	
 	@POST
@@ -54,4 +65,12 @@ public class Model {
     	return TodoDao.instance.getModel();
     }
 
+    // Defines that the next path parameter after todos is
+    // treated as a parameter and passed to the TodoResources
+    // Allows to type http://localhost:8080/com.vogella.jersey.todo/rest/todos/1
+    // 1 will be treaded as parameter todo and passed to TodoResource
+    @Path("{todo}")
+    public TodoResource getTodo(@PathParam("todo") String id) {
+        return new TodoResource(uriInfo, request, id);
+    }
 }
