@@ -1,5 +1,9 @@
 package io.github.frobino.app;
 
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,16 +28,27 @@ public class TodoResource {
         this.id = Integer.parseInt(id);
     }
 
-    //Application integration
+    /*
+	 * (R) read a single todo from the todos list.
+	 * Which todo to read is specified in the URI.
+	 * 
+	 * This is just to return a json when browsing to model/1.
+	 * Maybe not needed for this example?
+	 */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Todo getTodo() {
-        Todo todo = TodoDao.instance.getModel().get(id);
-        if(todo==null)
-            throw new RuntimeException("Get: Todo with " + id +  " not found");
+    public List<Todo> getTodo() {
+        List<Todo> todo = TodoDao.instance.getModel().stream()
+        		.filter(t -> (t.getId() == id))
+        		.collect(Collectors.toList());
+        if (todo.isEmpty())
+        	throw new RuntimeException("Get: Todo with " + id +  " not found");
         return todo;
     }
 
+    /*
+     * (U) Update (using a post). TODO
+     */
     /*
     @PUT
     @Consumes(MediaType.APPLICATION_XML)
@@ -43,6 +58,10 @@ public class TodoResource {
     }
     */
 
+    /*
+     * (D) delete a single todo from the todos list.
+	 * Which todo to delete is specified in the URI.
+     */
     @DELETE
     public Response deleteTodo() {
 		TodoDao.instance.getModel().removeIf(todo -> (todo.getId() == id));

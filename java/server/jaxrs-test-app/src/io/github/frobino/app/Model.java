@@ -29,7 +29,13 @@ public class Model {
     Request request;
 	
     public Model(){}
-	
+    
+	/*
+	 * (C) create a todo.
+	 * 
+	 * Not using a PUT here because we are providing the URI of the "model" resource,
+	 * not the URI identifying the todo.id (e.g. model/1)
+	 */
 	@POST
 	@Consumes(MediaType.TEXT_PLAIN)
     public Response addTodo(final String todoText) {
@@ -59,6 +65,9 @@ public class Model {
     }
     */
 
+	/*
+	 * (R) read the list of todos from the model
+	 */
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public List<Todo> getTodos() {
@@ -68,9 +77,9 @@ public class Model {
     // Defines that the next path parameter after todos is
     // treated as a parameter and passed to the TodoResources
     // Allows to type http://localhost:8080/com.vogella.jersey.todo/rest/todos/1
-    // 1 will be treaded as parameter todo and passed to TodoResource
-    @Path("{todo}")
-    public TodoResource getTodo(@PathParam("todo") String id) {
+    // 1 will be treaded as parameter todo.id and passed to TodoResource
+    @Path("{todoId}")
+    public TodoResource getTodo(@PathParam("todoId") String id) {
         return new TodoResource(uriInfo, request, id);
     }
 }
