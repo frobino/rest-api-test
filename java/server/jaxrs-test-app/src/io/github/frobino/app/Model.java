@@ -1,7 +1,8 @@
 package io.github.frobino.app;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -39,11 +40,11 @@ public class Model {
 	@POST
 	@Consumes(MediaType.TEXT_PLAIN)
     public Response addTodo(final String todoText) {
-		Vector<Todo> todos = TodoDao.instance.getModel();
+		Map<Integer,Todo> todos = TodoDao.instance.getModel();
 		
-        int id = todos.size() > 0 ? todos.elementAt(todos.size() - 1).getId() + 1 : 1;
+        int id = todos.size() > 0 ? todos.get(todos.size()).getId() + 1 : 1;
         Todo todo = new Todo(id, todoText, false);
-        todos.add(todo);
+        todos.put(id, todo);
 
         // debug printf similar
         return Response.status(201)  
@@ -72,7 +73,7 @@ public class Model {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public List<Todo> getTodos() {
-    	return TodoDao.instance.getModel();
+    	return new ArrayList<Todo>(TodoDao.instance.getModel().values());
     }
 
     // Defines that the next path parameter after todos is

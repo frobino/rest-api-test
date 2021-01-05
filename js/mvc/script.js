@@ -281,7 +281,7 @@ class Controller {
     let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
     xhr.open("POST", resource);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xhr.send(JSON.stringify({"id": id, "text": todoText, "complete": true}))
+    xhr.send(JSON.stringify({"id": id, "text": todoText, "complete": false}))
 
     this.model.editTodo(id, todoText)
   }
@@ -302,6 +302,15 @@ class Controller {
 
   handleToggleTodo = id => {
     // TODO frobino: POST {id}
+
+    let xhr = new XMLHttpRequest();
+    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
+    xhr.open("POST", resource);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    // FIXME: as shortcut I am using the "complete" param to differentiate
+    // between updating whole todo, or if to just toggle the complete flag.
+    xhr.send(JSON.stringify({"id": id, "text": "", "complete": true}))
+
     this.model.toggleTodo(id)
   }
 }

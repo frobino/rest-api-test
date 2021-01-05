@@ -1,8 +1,5 @@
 package io.github.frobino.app;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -35,38 +32,34 @@ public class TodoResource {
 	 */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Todo> getTodo() {
-        List<Todo> todo = TodoDao.instance.getModel().stream()
-        		.filter(t -> (t.getId() == id))
-        		.collect(Collectors.toList());
-        if (todo.isEmpty())
+    public Todo getTodo() {
+    	Todo todo = TodoDao.instance.getModel().get(id);
+        if (todo == null)
         	throw new RuntimeException("Get: Todo with " + id +  " not found");
         return todo;
     }
 
     /*
-     * (U) Update (using a post). TODO
+     * (U) Update (using a post).
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putTodo(Todo c) {
-    // public Response putTodo(JAXBElement<Todo> todo) {
-        // Todo c = todo.getValue();
-        // return putAndGetResponse(c);
+    public Response updateTodo(final Todo c) {
     	
     	int updatedId = c.getId();
     	String updatedText = c.getText();
-    	boolean updatedCompleted = c.getComplete();
+    	// FIXME: as shortcut I am using the complete param to differentiate
+    	// between updating whole todo, or if to just toggle the complete flag.
+    	// Separate end point or QueryParam would be a better option.
+    	boolean toggleComplete = c.getComplete();
     	
-    	List<Todo> todos = TodoDao.instance.getModel();
-        List<Todo> todo = todos.stream()
-        		.filter(t -> (t.getId() == updatedId))
-        		.collect(Collectors.toList());
-        if(todo.size()!=1)
-            throw new RuntimeException("Update: Todo with " + updatedId +  " not found");
-
-        int indexToUpdate = todos.indexOf(todo.get(0));
-        todos.set(indexToUpdate, new Todo(updatedId, updatedText, updatedCompleted));
+    	boolean originalCompleteFlag = TodoDao.instance.getModel().get(updatedId).getComplete();
+    	String originalText = TodoDao.instance.getModel().get(updatedId).getText();
+    	
+    	if (toggleComplete)
+    		TodoDao.instance.getModel().replace(updatedId, new Todo(updatedId, originalText, !originalCompleteFlag));
+    	else
+    		TodoDao.instance.getModel().replace(updatedId, new Todo(updatedId, updatedText, originalCompleteFlag));
         
         return Response.status(200)  
                 .entity(" Received todo: "+ c.getId() + " " + c.getText() + " " + c.getComplete())  
@@ -79,7 +72,7 @@ public class TodoResource {
      */
     @DELETE
     public Response deleteTodo() {
-		TodoDao.instance.getModel().removeIf(todo -> (todo.getId() == id));
+		TodoDao.instance.getModel().remove(id);
 
         // frobino: TODO
         // this._commit(this.todos);

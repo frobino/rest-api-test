@@ -1,17 +1,17 @@
 package io.github.frobino.app;
 
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.Map;
 
 public enum TodoDao {
     instance;
 
-	// TODO: replace with hashmap
-    private Vector<Todo> todos = new Vector<Todo>();
+    private Map<Integer, Todo> todos = new HashMap<Integer, Todo>();
 
     // Singleton
     private TodoDao() {}
     
-    public Vector<Todo> getModel(){
+    public Map<Integer, Todo> getModel(){
         return todos;
     }
 
