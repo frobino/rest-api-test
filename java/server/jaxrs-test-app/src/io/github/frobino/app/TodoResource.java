@@ -1,20 +1,18 @@
 package io.github.frobino.app;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
 
 public class TodoResource {
     @Context
@@ -49,14 +47,31 @@ public class TodoResource {
     /*
      * (U) Update (using a post). TODO
      */
-    /*
-    @PUT
-    @Consumes(MediaType.APPLICATION_XML)
-    public Response putTodo(JAXBElement<Todo> todo) {
-        Todo c = todo.getValue();
-        return putAndGetResponse(c);
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response putTodo(Todo c) {
+    // public Response putTodo(JAXBElement<Todo> todo) {
+        // Todo c = todo.getValue();
+        // return putAndGetResponse(c);
+    	
+    	int updatedId = c.getId();
+    	String updatedText = c.getText();
+    	boolean updatedCompleted = c.getComplete();
+    	
+    	List<Todo> todos = TodoDao.instance.getModel();
+        List<Todo> todo = todos.stream()
+        		.filter(t -> (t.getId() == updatedId))
+        		.collect(Collectors.toList());
+        if(todo.size()!=1)
+            throw new RuntimeException("Update: Todo with " + updatedId +  " not found");
+
+        int indexToUpdate = todos.indexOf(todo.get(0));
+        todos.set(indexToUpdate, new Todo(updatedId, updatedText, updatedCompleted));
+        
+        return Response.status(200)  
+                .entity(" Received todo: "+ c.getId() + " " + c.getText() + " " + c.getComplete())  
+                .build();
     }
-    */
 
     /*
      * (D) delete a single todo from the todos list.

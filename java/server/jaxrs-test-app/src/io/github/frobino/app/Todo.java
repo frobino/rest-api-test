@@ -14,7 +14,10 @@ public class Todo {
     private String text;
     private Boolean complete;
     
-    Todo(int id, String text, Boolean complete){
+    public Todo(){
+    }
+    
+    public Todo(int id, String text, Boolean complete){
         this.id = id;
         this.text = text;
         this.complete = complete;

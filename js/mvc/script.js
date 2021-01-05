@@ -276,11 +276,18 @@ class Controller {
 
   handleEditTodo = (id, todoText) => {
     // TODO frobino: POST {id, todoText}
+
+    let xhr = new XMLHttpRequest();
+    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
+    xhr.open("POST", resource);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.send(JSON.stringify({"id": id, "text": todoText, "complete": true}))
+
     this.model.editTodo(id, todoText)
   }
 
   handleDeleteTodo = id => {
-    // TODO frobino: POST {id} or maybe DELETE to crunchify/model/1 ?
+    // TODO frobino: DELETE to crunchify/model/1 ?
 
     let xhr = new XMLHttpRequest();
     let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;

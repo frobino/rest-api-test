@@ -45,6 +45,7 @@ public class Model {
         Todo todo = new Todo(id, todoText, false);
         todos.add(todo);
 
+        // debug printf similar
         return Response.status(201)  
                .entity(" Product added successfuly. Todos size: "+ todos.size())  
                .build();  
