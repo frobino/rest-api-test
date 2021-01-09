@@ -1,8 +1,12 @@
 package io.github.frobino.app;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -10,6 +14,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TodoResource {
     @Context
@@ -47,37 +54,90 @@ public class TodoResource {
      * 
      * RESTFUL service essence:
      * It is all about "create resources and apply the HTTP verbs against it".
+     * 
+     * Better options:
+     * - Toggle is not a restful action, so PUT cannot be used.
+     *   Separate end point (create the "toggle todo resource"),
+     *   e.g. POST model/toggle/1
+     *   or PUT/POST/DELETE/GET model/1/toggled
+     * - create a separate PATCH [{"op": "toggle"}, {"op": "editText", "id": <id>, "text": "updatedText"}]
+     * - use QueryParam?
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateTodo(final Todo c) {
-    	
     	int updatedId = c.getId();
     	String updatedText = c.getText();
-    	/* FIXME: as shortcut I am using the complete param to differentiate
-    	 * between updating whole todo, or if to just toggle the complete flag.
-    	 *  
-    	 * Better options:
-    	 * - Toggle is not a restful action, so PUT cannot be used.
-    	 *   Separate end point (create the "toggle todo resource"),
-    	 *   e.g. POST model/toggle/1
-    	 *   or PUT/POST/DELETE/GET model/1/toggled
-    	 * - create a separate PATCH [{"op": "toggle"}, {"op": "editText", "id": <id>, "text": "updatedText"}]
-    	 * - use QueryParam?
-    	 */
-    	boolean toggleComplete = c.getComplete();
+    	boolean updatedComplete = c.getComplete();
     	
-    	boolean originalCompleteFlag = TodoDao.instance.getModel().get(updatedId).getComplete();
-    	String originalText = TodoDao.instance.getModel().get(updatedId).getText();
+    	TodoDao.instance.getModel().replace(updatedId, new Todo(updatedId, updatedText, updatedComplete));
     	
-    	if (toggleComplete)
-    		TodoDao.instance.getModel().replace(updatedId, new Todo(updatedId, originalText, !originalCompleteFlag));
-    	else
-    		TodoDao.instance.getModel().replace(updatedId, new Todo(updatedId, updatedText, originalCompleteFlag));
-        
         return Response.status(200)  
                 .entity(" Received todo: "+ c.getId() + " " + c.getText() + " " + c.getComplete())  
                 .build();
+    }
+    
+    /*
+     * (U) Update (using a patch).
+     * 
+     * Test like this:
+     * curl -H "Content-Type: application/json" --data '{"color": "new_value"}' -X PATCH http://127.0.0.1:8080/jaxrs-test-app/crunchify/model/1
+     */
+    @PATCH
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response editTodo(InputStream is) {
+    	
+    	ObjectMapper objectMapper = new ObjectMapper();
+    	JsonNode jsonNode = null;
+    	String op = "";
+		try {
+			jsonNode = objectMapper.readTree(is);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if (jsonNode == null)
+	        return Response.status(500)  
+	                .entity("Client is sending something weird")  
+	                .build();
+		
+    	op = jsonNode.get("op").asText();		
+		if (op == null)
+	        return Response.status(500)  
+	                .entity("Operation non valid")  
+	                .build();
+		
+		switch (op) {
+		case "toggle":
+			Todo todoToToggle = TodoDao.instance.getModel().get(this.id);
+			boolean currentCompeteFlag = todoToToggle.getComplete();
+			String currentText = todoToToggle.getText();
+    		TodoDao.instance.getModel().replace(this.id, new Todo(this.id, currentText, !currentCompeteFlag));
+			break;
+		/*
+		case "edit":
+	    	String newText = jsonNode.get("text").asText();		
+			if (newText == null)
+		        return Response.status(500)  
+		                .entity("Edit operation failed")  
+		                .build();
+			
+			Todo todoToEdit = TodoDao.instance.getModel().get(this.id);
+			currentCompeteFlag = todoToEdit.getComplete();
+    		TodoDao.instance.getModel().replace(this.id, new Todo(this.id, newText, currentCompeteFlag));
+			break;
+		*/
+		default:
+	        return Response.status(500)  
+	                .entity("Operation non valid")  
+	                .build();
+		}
+
+        return Response.status(200)  
+                .entity("Addsomethinghere: " + op)  
+                .build();
+
     }
 
     /*
@@ -90,13 +150,7 @@ public class TodoResource {
 
         // frobino: TODO
         // this._commit(this.todos);
-
-    	/*
-        Todo c = TodoDao.instance.getModel().remove(id);
-        if(c==null)
-            throw new RuntimeException("Delete: Todo with " + id +  " not found");
-        */
-		
+	
 		// frobino: TODO if/else response
 		return Response.noContent().build();
     }
