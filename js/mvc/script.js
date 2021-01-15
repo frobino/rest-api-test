@@ -268,9 +268,13 @@ class Controller {
     // TODO frobino: POST {todoText}
 
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8080/jaxrs-test-app/crunchify/model");
+    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model";
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("POST", resource, false);
     xhr.send(todoText)
 
+    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
+    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
     this.model.addTodo(todoText)
   }
 
@@ -279,10 +283,13 @@ class Controller {
 
     let xhr = new XMLHttpRequest();
     let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
-    xhr.open("POST", resource);
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("POST", resource, false);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.send(JSON.stringify({"id": id, "text": todoText, "complete": false}))
 
+    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
+    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
     this.model.editTodo(id, todoText)
   }
 
@@ -291,12 +298,15 @@ class Controller {
 
     let xhr = new XMLHttpRequest();
     let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
-    xhr.open("DELETE", resource);
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("DELETE", resource, false);
     // xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
     // xhr.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With, Authorization, Accept-Version, Content-MD5, CSRF-Token, Content-Type");
     // xhr.setRequestHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
     xhr.send()
 
+    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
+    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
     this.model.deleteTodo(id)
   }
 
@@ -305,11 +315,14 @@ class Controller {
 
     let xhr = new XMLHttpRequest();
     let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
-    xhr.open("PATCH", resource, true);
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("PATCH", resource, false);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.send(JSON.stringify({"op": "toggle"}))
 
-    // this.model.toggleTodo(id)
+    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
+    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
+    this.model.toggleTodo(id)
   }
 }
 

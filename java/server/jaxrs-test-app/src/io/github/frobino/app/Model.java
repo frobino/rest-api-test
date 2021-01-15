@@ -46,10 +46,20 @@ public class Model {
         Todo todo = new Todo(id, todoText, false);
         todos.put(id, todo);
 
+        /* 201 - created:
+         * Response to a POST that results in a creation.
+         * Should be combined with a Location header pointing to the location of the new resource
+         * 
+         * TODO: add the correct uri path (including id)
+         */
+        return Response.created(uriInfo.getAbsolutePath()).build();
+
+        /*
         // debug printf similar
         return Response.status(201)  
                .entity(" Product added successfuly. Todos size: "+ todos.size())  
-               .build();  
+               .build();
+        */
         
         // frobino: TODO
         // this._commit(this.todos);

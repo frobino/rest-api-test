@@ -57,3 +57,5 @@ Expected 36.666
 [add CORS to jaxrs (jersey) server](https://crunchify.com/what-is-cross-origin-resource-sharing-cors-how-to-add-it-to-your-java-jersey-web-server/)
 
 [implement CRUD using jaxb](https://www.vogella.com/tutorials/REST/article.html)
+
+[what to answer for each api call](https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api)

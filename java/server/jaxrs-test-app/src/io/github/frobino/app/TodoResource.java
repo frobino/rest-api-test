@@ -72,9 +72,18 @@ public class TodoResource {
     	
     	TodoDao.instance.getModel().replace(updatedId, new Todo(updatedId, updatedText, updatedComplete));
     	
+		/*
+		 * 200 OK:
+		 * Response to a successful GET, PUT, PATCH or DELETE.
+		 * Can also be used for a POST that doesn't result in a creation.
+		 */
+		return Response.ok().build();
+    	/*
         return Response.status(200)  
                 .entity(" Received todo: "+ c.getId() + " " + c.getText() + " " + c.getComplete())  
                 .build();
+        */
+
     }
     
     /*
@@ -134,9 +143,18 @@ public class TodoResource {
 	                .build();
 		}
 
+		/*
+		 * 200 OK:
+		 * Response to a successful GET, PUT, PATCH or DELETE.
+		 * Can also be used for a POST that doesn't result in a creation.
+		 */
+		return Response.ok().build();
+		
+		/*
         return Response.status(200)  
                 .entity("Addsomethinghere: " + op)  
                 .build();
+        */
 
     }
 
@@ -152,6 +170,12 @@ public class TodoResource {
         // this._commit(this.todos);
 	
 		// frobino: TODO if/else response
+		
+		/*
+		 * 204 No Content:
+		 * Response to a successful request
+		 * that won't be returning a body
+		 */
 		return Response.noContent().build();
     }
 
