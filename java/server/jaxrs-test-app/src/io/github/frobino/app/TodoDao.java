@@ -1,12 +1,14 @@
 package io.github.frobino.app;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public enum TodoDao {
     instance;
 
-    private Map<Integer, Todo> todos = new HashMap<Integer, Todo>();
+	// HashMap implementation that stores the order in which keys are inserted.
+	// Useful to keep track of generated todoIds.
+    private Map<Integer, Todo> todos = new LinkedHashMap<Integer, Todo>();
 
     // Singleton
     private TodoDao() {}

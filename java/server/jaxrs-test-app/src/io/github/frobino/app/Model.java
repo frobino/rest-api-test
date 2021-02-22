@@ -28,7 +28,7 @@ public class Model {
     UriInfo uriInfo;
     @Context
     Request request;
-	
+    
     public Model(){}
     
 	/*
@@ -42,17 +42,17 @@ public class Model {
     public Response addTodo(final String todoText) {
 		Map<Integer,Todo> todos = TodoDao.instance.getModel();
 		
-        int id = todos.size() > 0 ? todos.get(todos.size()).getId() + 1 : 1;
+        // Integer id = todos.size() > 0 ? todos.get(todos.size()).getId() + 1 : 1;
+		Integer[] todoIds = todos.keySet().toArray(new Integer[todos.size()]);
+		Integer id = todos.size() > 0 ? (todoIds[todos.size() - 1] + 1) : 1;
         Todo todo = new Todo(id, todoText, false);
         todos.put(id, todo);
 
         /* 201 - created:
          * Response to a POST that results in a creation.
          * Should be combined with a Location header pointing to the location of the new resource
-         * 
-         * TODO: add the correct uri path (including id)
          */
-        return Response.created(uriInfo.getAbsolutePath()).build();
+        return Response.created(uriInfo.getAbsolutePath().resolve(id.toString())).build();
 
         /*
         // debug printf similar
@@ -60,23 +60,8 @@ public class Model {
                .entity(" Product added successfuly. Todos size: "+ todos.size())  
                .build();
         */
-        
-        // frobino: TODO
-        // this._commit(this.todos);
     }
     
-	/*
-	@POST
-	@Consumes(MediaType.TEXT_PLAIN)
-    public void deleteTodo(int id) {
-		Vector<Todo> todos = TodoDao.instance.getModel();
-    	todos.removeIf(todo -> (todo.getId() == id));
-    	
-        // frobino: TODO
-        // this._commit(this.todos);
-    }
-    */
-
 	/*
 	 * (R) read the list of todos from the model
 	 */
