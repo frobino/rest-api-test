@@ -78,12 +78,6 @@ public class TodoResource {
 		 * Can also be used for a POST that doesn't result in a creation.
 		 */
 		return Response.ok().build();
-    	/*
-        return Response.status(200)  
-                .entity(" Received todo: "+ c.getId() + " " + c.getText() + " " + c.getComplete())  
-                .build();
-        */
-
     }
     
     /*
@@ -149,13 +143,6 @@ public class TodoResource {
 		 * Can also be used for a POST that doesn't result in a creation.
 		 */
 		return Response.ok().build();
-		
-		/*
-        return Response.status(200)  
-                .entity("Addsomethinghere: " + op)  
-                .build();
-        */
-
     }
 
     /*
@@ -166,9 +153,6 @@ public class TodoResource {
     public Response deleteTodo() {
 		TodoDao.instance.getModel().remove(id);
 
-        // frobino: TODO
-        // this._commit(this.todos);
-	
 		// frobino: TODO if/else response
 		
 		/*

@@ -50,7 +50,7 @@ public class Model {
 
         /* 201 - created:
          * Response to a POST that results in a creation.
-         * Should be combined with a Location header pointing to the location of the new resource
+         * The returned Response contains a Location header pointing to the location of the new resource
          */
         return Response.created(uriInfo.getAbsolutePath().resolve(id.toString())).build();
 
