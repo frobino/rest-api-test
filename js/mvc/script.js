@@ -1,58 +1,4 @@
 /**
- * @class Model
- *
- * Manages the data of the application.
- */
-class Model {
-  constructor() {
-    this.todos = JSON.parse(localStorage.getItem('todos')) || []
-  }
-
-  bindTodoListChanged(callback) {
-    this.onTodoListChanged = callback
-  }
-
-  _commit(todos) {
-    this.onTodoListChanged(todos)
-    localStorage.setItem('todos', JSON.stringify(todos))
-  }
-
-  addTodo(todoText) {
-    const todo = {
-      id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
-      text: todoText,
-      complete: false,
-    }
-
-    this.todos.push(todo)
-
-    this._commit(this.todos)
-  }
-
-  editTodo(id, updatedText) {
-    this.todos = this.todos.map(todo =>
-      todo.id === id ? { id: todo.id, text: updatedText, complete: todo.complete } : todo
-    )
-
-    this._commit(this.todos)
-  }
-
-  deleteTodo(id) {
-    this.todos = this.todos.filter(todo => todo.id !== id)
-
-    this._commit(this.todos)
-  }
-
-  toggleTodo(id) {
-    this.todos = this.todos.map(todo =>
-      todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
-    )
-
-    this._commit(this.todos)
-  }
-}
-
-/**
  * @class View
  *
  * Visual representation of the model.
@@ -166,6 +112,7 @@ class View {
 
   bindDeleteTodo(handler) {
     this.todoList.addEventListener('click', event => {
+      // frobino: delete uses the id stored in html, this is GOOD to eliminate model
       if (event.target.className === 'delete') {
         const id = parseInt(event.target.parentElement.id)
 
@@ -201,28 +148,25 @@ class View {
  *
  * Links the user input and the view output.
  *
- * @param model
  * @param view
  */
 class Controller {
-  constructor(model, view) {
-    this.model = model
+  constructor(view) {
     this.view = view
 
     // Explicit this binding
-    this.model.bindTodoListChanged(this.onTodoListChanged)
     this.view.bindAddTodo(this.handleAddTodo)
     this.view.bindEditTodo(this.handleEditTodo)
     this.view.bindDeleteTodo(this.handleDeleteTodo)
     this.view.bindToggleTodo(this.handleToggleTodo)
 
     // Display initial todos
-    this.onTodoListChanged(this.model.todos)
+    this.onTodoListChanged()
   }
 
   // MODEL -> VIEW
 
-  onTodoListChanged = todos => {
+  onTodoListChanged = () => {
     // frobino: GET, receive list of todos [{},{},...]
     //
     // original:
@@ -275,7 +219,8 @@ class Controller {
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    this.model.addTodo(todoText)
+    // this.model.addTodo(todoText)
+    this.onTodoListChanged()
   }
 
   handleEditTodo = (id, todoText) => {
@@ -290,7 +235,8 @@ class Controller {
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    this.model.editTodo(id, todoText)
+    // this.model.editTodo(id, todoText)
+    this.onTodoListChanged()
   }
 
   handleDeleteTodo = id => {
@@ -307,7 +253,8 @@ class Controller {
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    this.model.deleteTodo(id)
+    // this.model.deleteTodo(id)
+    this.onTodoListChanged()
   }
 
   handleToggleTodo = id => {
@@ -322,8 +269,9 @@ class Controller {
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    this.model.toggleTodo(id)
+    // this.model.toggleTodo(id)
+    this.onTodoListChanged()
   }
 }
 
-const app = new Controller(new Model(), new View())
+const app = new Controller(new View())
