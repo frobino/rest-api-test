@@ -1,4 +1,79 @@
 /**
+ * @class Model
+ *
+ * Interface to the model containing data.
+ * Can be created by YAML file, once an API is defined.
+ */
+class Model {
+  constructor(modelApiLocation) {
+    this.modelApiLocation = modelApiLocation;
+  }
+
+  /**
+   * POST {todoText}
+   * 
+   * @param {*} todoText text for the Todo to add
+   */
+  addTodo(todoText){
+    let xhr = new XMLHttpRequest();
+    let resource = modelApiLocation;
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("POST", resource, false);
+    xhr.send(todoText)
+    // TODO: handle response
+  }
+
+  /**
+   * DELETE to crunchify/model/1
+   * 
+   * @param {*} id the unique id of the Todo to delete
+   */
+  deleteTodo(id){
+    let xhr = new XMLHttpRequest();
+    let resource = modelApiLocation + '/' + id;
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("DELETE", resource, false);
+    // xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+    // xhr.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With, Authorization, Accept-Version, Content-MD5, CSRF-Token, Content-Type");
+    // xhr.setRequestHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+    xhr.send()    
+    // TODO: handle response
+  }
+
+  /**
+   * POST {id, todoText}
+   * 
+   * @param {*} id unique id of the Todo to update
+   * @param {*} todoText new text to be used when updating the Todo
+   */
+  editTodo(id, todoText){
+    let xhr = new XMLHttpRequest();
+    let resource = modelApiLocation + '/' + id;
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("POST", resource, false);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.send(JSON.stringify({"id": id, "text": todoText, "complete": false}))
+    // TODO: handle response
+  }
+
+  /**
+   * PATCH {id}
+   * 
+   * @param {*} id unique id of the Todo to be toggled
+   */
+  toggleTodo(id){
+    let xhr = new XMLHttpRequest();
+    let resource = modelApiLocation + '/' + id;
+    // Using sync call, to make sure model gets updated before getting the model back
+    xhr.open("PATCH", resource, false);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.send(JSON.stringify({"op": "toggle"}))
+    // TODO: handle response
+  }
+
+}
+
+/**
  * @class View
  *
  * Visual representation of the model.
@@ -151,7 +226,8 @@ class View {
  * @param view
  */
 class Controller {
-  constructor(view) {
+  constructor(model, view) {
+    this.model = model
     this.view = view
 
     // Explicit this binding
@@ -209,13 +285,8 @@ class Controller {
   // VIEW -> MODEL
 
   handleAddTodo = todoText => {
-    // TODO frobino: POST {todoText}
 
-    let xhr = new XMLHttpRequest();
-    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model";
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("POST", resource, false);
-    xhr.send(todoText)
+    this.model.addTodo(todoText)
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
@@ -224,14 +295,8 @@ class Controller {
   }
 
   handleEditTodo = (id, todoText) => {
-    // TODO frobino: POST {id, todoText}
 
-    let xhr = new XMLHttpRequest();
-    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("POST", resource, false);
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xhr.send(JSON.stringify({"id": id, "text": todoText, "complete": false}))
+    this.model.editTodo(id, todoText)
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
@@ -240,16 +305,8 @@ class Controller {
   }
 
   handleDeleteTodo = id => {
-    // TODO frobino: DELETE to crunchify/model/1 ?
 
-    let xhr = new XMLHttpRequest();
-    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("DELETE", resource, false);
-    // xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-    // xhr.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With, Authorization, Accept-Version, Content-MD5, CSRF-Token, Content-Type");
-    // xhr.setRequestHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-    xhr.send()
+    this.model.deleteTodo(id)
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
@@ -258,14 +315,8 @@ class Controller {
   }
 
   handleToggleTodo = id => {
-    // TODO frobino: PATCH {id}
 
-    let xhr = new XMLHttpRequest();
-    let resource = "http://localhost:8080/jaxrs-test-app/crunchify/model/" + id;
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("PATCH", resource, false);
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xhr.send(JSON.stringify({"op": "toggle"}))
+    this.model.toggleTodo(id)
 
     // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
     // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
@@ -274,4 +325,5 @@ class Controller {
   }
 }
 
-const app = new Controller(new View())
+const modelApiLocation = "http://localhost:8080/jaxrs-test-app/crunchify/model"
+const app = new Controller(new Model(modelApiLocation), new View())
