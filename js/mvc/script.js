@@ -71,6 +71,37 @@ class Model {
     // TODO: handle response
   }
 
+  /**
+   * GET and execute a function on the result data returned
+   * 
+   * @param {*} callback - unary function to be executed
+   * with the GET call result. The function should
+   * get the JSON representation of all todos as parameter
+   * and act on it.
+   * The returned JSON representation is 
+   * [{"id":1,"text":"t1","complete":false}, ...]
+   */
+  getTodosAndExec(callback) {
+
+    var xhr = new XMLHttpRequest();
+    let resource = modelApiLocation;
+    xhr.open('GET', resource, true);
+    xhr.responseType = 'json';
+
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status == 200) {
+        callback(xhr.response);
+      } else {
+        // TODO: improve error handling
+        console.error(status);
+      }
+    };
+
+    xhr.send();
+    // TODO: handle response
+  };
+
 }
 
 /**
@@ -174,6 +205,15 @@ class View {
     })
   }
 
+  /**
+   * Configure the view to execute an handler when a
+   * "Submit" type of event is emitted (user clicks on
+   * "add todo" button - see constructor).
+   * 
+   * @param {*} handler - unary function to be executed
+   * when the submit event is emitted. The function should
+   * get the todo text as parameter and act on it.
+   */
   bindAddTodo(handler) {
     this.form.addEventListener('submit', event => {
       event.preventDefault()
@@ -231,97 +271,63 @@ class Controller {
     this.view = view
 
     // Explicit this binding
+    /*
+     * NOTE: we use mainly callbacks.
+     * How callback vs promises work:
+     * https://stackoverflow.com/questions/38829610/how-i-can-return-xmlhttprequest-response-from-function
+     */
     this.view.bindAddTodo(this.handleAddTodo)
     this.view.bindEditTodo(this.handleEditTodo)
     this.view.bindDeleteTodo(this.handleDeleteTodo)
     this.view.bindToggleTodo(this.handleToggleTodo)
 
     // Display initial todos
-    this.onTodoListChanged()
-  }
-
-  // MODEL -> VIEW
-
-  onTodoListChanged = () => {
-    // frobino: GET, receive list of todos [{},{},...]
-    //
-    // original:
-    // this.view.displayTodos(todos)
-
-    var getJSON = function(url, view, callback) {
-
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      xhr.responseType = 'json';
-
-      xhr.onload = function() {
-
-          var status = xhr.status;
-
-          if (status == 200) {
-              callback(null, xhr.response, view);
-          } else {
-              callback(status);
-          }
-      };
-
-      xhr.send();
-    };
-
-    getJSON('http://localhost:8080/jaxrs-test-app/crunchify/model', this.view,
-      function(err, data, view) {
-        if (err != null) {
-            console.error(err);
-        } else {
-         // Debug
-         console.log('Output: ', data);
-         view.displayTodos(data)
-        }
-      }
-    );
+    /*
+     * NOTE: the following syntax does not work due to meaning of "this":
+     * https://stackoverflow.com/questions/20279484/how-to-access-the-correct-this-inside-a-callback
+     * 
+     * this.model.getTodosAndExec(this.view.displayTodos)
+     */
+    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
 
   }
 
-  // VIEW -> MODEL
-
+  /**
+   * Handler (callback) function that should be executed
+   * everytime the user clicks on the "add todo" button.
+   * 
+   * VIEW -> MODEL
+   * It sends the todo text to the model
+   * 
+   * MODEL -> VIEW
+   * Using the model.getTodosAndExec, data is retreived
+   * from the model, and the data is forwarded to the
+   * view.displayTodos to be displayed
+   * 
+   * @param {*} todoText text to be added
+   */
   handleAddTodo = todoText => {
 
     this.model.addTodo(todoText)
-
-    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
-    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    // this.model.addTodo(todoText)
-    this.onTodoListChanged()
+    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 
   handleEditTodo = (id, todoText) => {
 
     this.model.editTodo(id, todoText)
-
-    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
-    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    // this.model.editTodo(id, todoText)
-    this.onTodoListChanged()
+    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 
   handleDeleteTodo = id => {
 
     this.model.deleteTodo(id)
-
-    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
-    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    // this.model.deleteTodo(id)
-    this.onTodoListChanged()
+    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 
   handleToggleTodo = id => {
 
     this.model.toggleTodo(id)
-
-    // TODO: this is just to trigger the onTodoListChanged method (making a GET of the whole model).
-    // Replace with proper logic (e.g. call directly onTodoListChanged) and remove model.
-    // this.model.toggleTodo(id)
-    this.onTodoListChanged()
+    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 }
 
