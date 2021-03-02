@@ -9,6 +9,34 @@ class Model {
     this.modelApiLocation = modelApiLocation;
   }
 
+  bindTodoListChanged(callback) {
+    this.onTodoListChanged = callback
+  }
+
+  /**
+   * Helper to enable async requests.
+   * Include logic to specify what to do once a
+   * request is considered successful / accepted.
+   * 
+   * @param {*} xhr opened XMLHttpRequest object
+   * @param {*} acceptedStatus request response that can
+   * be considered acceptable to execute callback
+   */
+  _setupRequest(xhr, acceptedStatus){
+    let callback = this.getTodosAndExec
+    let callbackArg = this.onTodoListChanged
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status == acceptedStatus) {
+        // Here we specify what to do everytime a request is successful
+        callback((todos) => callbackArg(todos))
+      } else {
+        // TODO: improve error handling
+        console.error(status);
+      }
+    };
+  }
+
   /**
    * POST {todoText}
    * 
@@ -17,8 +45,8 @@ class Model {
   addTodo(todoText){
     let xhr = new XMLHttpRequest();
     let resource = modelApiLocation;
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("POST", resource, false);
+    xhr.open("POST", resource, true);
+    this._setupRequest(xhr, 201)
     xhr.send(todoText)
     // TODO: handle response
   }
@@ -31,11 +59,11 @@ class Model {
   deleteTodo(id){
     let xhr = new XMLHttpRequest();
     let resource = modelApiLocation + '/' + id;
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("DELETE", resource, false);
+    xhr.open("DELETE", resource, true);
     // xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
     // xhr.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With, Authorization, Accept-Version, Content-MD5, CSRF-Token, Content-Type");
     // xhr.setRequestHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+    this._setupRequest(xhr, 204)
     xhr.send()    
     // TODO: handle response
   }
@@ -49,9 +77,9 @@ class Model {
   editTodo(id, todoText){
     let xhr = new XMLHttpRequest();
     let resource = modelApiLocation + '/' + id;
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("POST", resource, false);
+    xhr.open("POST", resource, true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    this._setupRequest(xhr, 200)
     xhr.send(JSON.stringify({"id": id, "text": todoText, "complete": false}))
     // TODO: handle response
   }
@@ -64,9 +92,9 @@ class Model {
   toggleTodo(id){
     let xhr = new XMLHttpRequest();
     let resource = modelApiLocation + '/' + id;
-    // Using sync call, to make sure model gets updated before getting the model back
-    xhr.open("PATCH", resource, false);
+    xhr.open("PATCH", resource, true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    this._setupRequest(xhr, 200)
     xhr.send(JSON.stringify({"op": "toggle"}))
     // TODO: handle response
   }
@@ -281,6 +309,8 @@ class Controller {
     this.view.bindDeleteTodo(this.handleDeleteTodo)
     this.view.bindToggleTodo(this.handleToggleTodo)
 
+    this.model.bindTodoListChanged(this.onTodoListChanged)
+
     // Display initial todos
     /*
      * NOTE: the following syntax does not work due to meaning of "this":
@@ -288,8 +318,22 @@ class Controller {
      * 
      * this.model.getTodosAndExec(this.view.displayTodos)
      */
-    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
+    // this.model.getTodosAndExec((data) => this.view.displayTodos(data))
+    this.model.getTodosAndExec((data) => this.onTodoListChanged(data))
+  }
 
+  /**
+   * Handler (callback) function that should be executed
+   * everytime the model todo list changes.
+   * 
+   * MODEL -> VIEW
+   * Using the model.getTodosAndExec, data is retreived
+   * from the model, and the data is forwarded to the
+   * view.displayTodos to be displayed
+   * 
+   */
+  onTodoListChanged = todos => {
+    this.view.displayTodos(todos)
   }
 
   /**
@@ -299,35 +343,22 @@ class Controller {
    * VIEW -> MODEL
    * It sends the todo text to the model
    * 
-   * MODEL -> VIEW
-   * Using the model.getTodosAndExec, data is retreived
-   * from the model, and the data is forwarded to the
-   * view.displayTodos to be displayed
-   * 
    * @param {*} todoText text to be added
    */
   handleAddTodo = todoText => {
-
     this.model.addTodo(todoText)
-    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 
   handleEditTodo = (id, todoText) => {
-
     this.model.editTodo(id, todoText)
-    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 
   handleDeleteTodo = id => {
-
     this.model.deleteTodo(id)
-    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 
   handleToggleTodo = id => {
-
     this.model.toggleTodo(id)
-    this.model.getTodosAndExec((data) => this.view.displayTodos(data))
   }
 }
 
